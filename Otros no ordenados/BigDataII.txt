@@ -1,0 +1,49 @@
+export MAVEN_OPTS="-Xmx2048M -Xss128M -XX:MetaspaceSize=1024M -XX:MaxMetaspaceSize=2048M -XX:+CMSClassUnloadingEnabled"
+
+/opt/spark-2.2.0/bin/spark-submit --total-executor-cores 15 --executor-memory 10g --master spark://hadoop-master:7077 --class main.scala.runSuite BigDataIIEilder-1.0-jar-with-dependencies.jar
+
+Hay que resolver el problema utilizando la biblioteca MLLib y los algoritmos
+disponibles en Spark Packages. 
+
+Hay que describir en un fichero PDF detalladamente todo el proceso algorítmico
+utilizado, mostrando los resultados de cada uno de los algoritmos utilizados para
+entrenamiento y test, analizando el comportamiento de los algoritmos, y
+mostrando los flujos/combinaciones de algoritmos de preprocesamiento.
+Adicionalmente se debe adjuntar los SCRIPTS.
+
+
+
+DT train TPR x TPN 0.0
+DT test TPR x TPN 0.0
+DT ROS train TPR x TPN 0.44329370712007027
+DT ROS test TPR x TPN 0.44250464215903623
+DT RUS train TPR x TPN 0.4247533310890597
+DT RUS test TPR x TPN 0.42366726635081836
+DT FCNN filter train TPR x TPN 0.2440615910514342
+DT FCNN filter test TPR x TPN 0.24636628709115885
+RF train TPR x TPN 0.0
+RF test TPR x TPN 0.0
+RF ROS train TPR x TPN 0.4519283068153623
+RF ROS test TPR x TPN 0.45089399600315816
+RF RUS train TPR x TPN 0.45744690693161366
+RF RUS test TPR x TPN 0.457896970603763
+RF FCNN filter train TPR x TPN 0.0
+RF FCNN filter test TPR x TPN 0.0
+PCARD train TPR x TPN NaN
+PCARD test TPR x TPN NaN
+PCARD ROS train TPR x TPN 0.47414424666777005
+PCARD ROS test TPR x TPN 0.46998382905946484
+PCARD RUS train TPR x TPN 0.48795543183712026
+PCARD RUS test TPR x TPN 0.48303303422882365
+PCARD FCNN filter train TPR x TPN 0.5846292873198806
+PCARD FCNN filter test TPR x TPN 0.4550136204132162
+PCARD ROS HME-BD TPR x TPN 0.4639871746472688
+PCARD HME-BD ROS TPR x TPN 0.4286497654595424
+RF RUS train 0.5089 profundidad 8, 3000 árboles.
+RF RUS test 0.5014 profundidad 8, 3000 árboles.
+
+
+HME-BD noise filter
+SSMA-SFLSDE Reduction
+NCNEdit filter
+ROS

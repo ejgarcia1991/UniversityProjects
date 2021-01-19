@@ -1,0 +1,13 @@
+FROM mariadb:latest as sgbd
+RUN sed  -i 's/bind_address=127.0.0.1/#/g' /etc/mysql/my.cnf
+
+
+
+$ sudo docker build -f sgbd.dockerfile -t sgbd .
+
+$ sudo docker run --name sgbd -e MYSQL_ROOT_PASSWORD="1234" -d sgbd
+
+$ sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' sgbd
+$ mysql -h ip -u root -p (then type 1234)
+
+

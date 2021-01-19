@@ -1,0 +1,17 @@
+FROM python:3.8.2 AS cdpython
+
+RUN pip install --no-cache-dir pandas
+RUN pip install --no-cache-dir scikit-learn
+RUN pip install --no-cache-dir scipy
+RUN pip install --no-cache-dir numpy
+RUN pip install --no-cache-dir matplotlib
+
+
+
+
+$ docker build -f cdpython.dockerfile - t cdpython .
+
+$ docker run --rm -it cdpython
+
+help("modules")
+

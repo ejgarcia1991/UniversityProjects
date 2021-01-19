@@ -1,0 +1,39 @@
+---
+title: "ScriptEnvioFinal"
+author: "EMAD"
+date: "28/3/2020"
+output: pdf_document
+---
+
+Librerías
+```{r}
+library(readr)
+library(caret)
+library(randomForest)
+```
+
+```{r}
+seed<-156374562
+
+#Carga de datos
+dataset <- read_csv("Data/train.csv")
+dataset <- as.data.frame(dataset)
+
+#Eliminación de ID del conjunto de entrenamiento
+dataset$id<-NULL
+
+#Carga de datos de test
+test <- read_csv("Data/test.csv")
+test_id<-test$id 
+test$id<-NULL #elimino el id ya separado
+test[,1:29]<-scale(test[,1:29])
+
+set.seed(seed)
+model<-randomForest::randomForest(y~.,trainor,ntree=50000, mtry=12, nodesize = 1)
+predictedValues<-round(predict(model,newdata=test))
+
+#Preparación y escritura de los datos
+df<-data.frame(test_id,predictedValues)
+colnames(df)<-c("Id","Predicted")
+write_csv(df,path="Huge RF.csv")
+```

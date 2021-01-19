@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588092460460.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3348028850",
+    "id" : "8C8BC9A",
+    "lastKnownWriteTime" : 1588088896,
+    "last_content_update" : 1588088896,
+    "path" : "~/R Projects/GA/bag-genalg.R",
+    "project_path" : "bag-genalg.R",
+    "properties" : {
+        "cursorPosition" : "38,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

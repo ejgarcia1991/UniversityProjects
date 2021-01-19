@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588098666932.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3154183384",
+    "id" : "26E70AD2",
+    "lastKnownWriteTime" : 1588700710,
+    "last_content_update" : 1588700710922,
+    "path" : "~/R Projects/GA/parametrosGA.R",
+    "project_path" : "parametrosGA.R",
+    "properties" : {
+        "cursorPosition" : "35,9",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,141 @@
+---
+title: "EDA"
+author: "EMAD"
+date: "28/3/2020"
+output: pdf_document
+---
+
+Librerías
+```{r}
+library(readr)
+
+library(tidyverse)
+library(corrplot)
+library(Hmisc)
+library(pROC)
+library(DMwR)
+library(plotrix)
+library(RColorBrewer)
+library(FSelector)
+```
+
+Carga de datos
+```{r}
+dataset <- read_csv("datos/train.csv") #localización del dataset
+dataset <- as.data.frame(dataset)
+```
+
+Eliminar de ID del conjunto de entrenamiento
+```{r}
+dataset$id<-NULL
+```
+
+EDA
+```{r}
+dim(dataset)
+any(is.na(dataset))
+str(dataset)
+summary(dataset)
+```
+
+Desbalanceo de la clase dependiente
+```{r}
+table(dataset$y)
+
+ggplot(dataset %>% group_by(y) %>% summarise(Count = n()), aes(x=y, y=Count)) +
+  geom_bar(aes(y, Count), stat = "identity", fill = "indianred1") +
+  scale_x_continuous(breaks=c(0:9)) +
+  geom_label(aes(y, Count, label = Count), vjust = 1 ) +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+  ggtitle("Nº observaciones y")
+```
+
+
+```{r}
+t = table(dataset$y)
+n_classes <- c(t[[1]],t[[2]],t[[3]],t[[4]],t[[5]],t[[6]],t[[7]],t[[8]],t[[9]])
+
+pct <- round(n_classes/sum(n_classes)*100,digits=2)
+
+lbls.legend <- levels(as.factor(dataset$y))
+lbls.pct <- paste(pct,"%", sep="")
+
+pie(n_classes,
+    labels=lbls.pct,
+    clockwise=TRUE,
+    col=brewer.pal(7,"Set1"),
+    border="white",
+    radius=0.7,
+    cex=0.8,
+    main="class y distribution")
+
+
+legend("bottomright",legend=lbls.legend,bty="n", fill=brewer.pal(7,"Set1"))
+```
+
+Pie3D chart
+```{r}
+lbls <- paste(pct,"% ", "[", lbls.legend, "]",sep="")
+
+pie3D(n_classes, labels=lbls, explode=0.1, main="pie3d class y distribution", mar=c(2,2,2,2))
+```
+
+Histogramas de las variables X
+```{r}
+histX<-function (x,datos) {
+  n = names(datos)[x]
+  hist(datos[,x], main=paste("Histogram", n), xlab=n, col="grey")
+}
+
+par(mfrow=c(2,4)); 
+x<-sapply(2:(dim(dataset)[2]-1), histX, datos=dataset); 
+par(mfrow=c(1,1))
+
+```
+
+Histogramas de las variables X (ggplot)
+```{r}
+histX_ggplot <- function(x, datos){
+  label.x = names(datos)[x]
+  h = ggplot(data = dataset, aes(x=datos[,x], y=..density..)) +
+    labs(y="", x = label.x) +
+    geom_histogram(fill="orange",color="red",alpha = 0.5,bins =100) + geom_density()
+  
+  #ggplotly()
+  show(h)
+}
+
+h.list = sapply(2:(dim(dataset)[2]-1), histX_ggplot, datos=dataset);
+```
+
+Boxplot de cada variable en relacion a la clase
+
+```{r}
+boxplotX_ggplot <- function(x, datos){
+  label.x = names(datos)[x]
+  bx = ggplot(datos, aes(factor(y), datos$X_0)) + 
+    labs(y="", x = label.x) +
+    geom_boxplot(aes(fill = factor(y)))
+  
+  #ggplotly()
+  show(bx)
+}
+
+bx.list = sapply(2:(dim(dataset)[2]-1), boxplotX_ggplot, datos=dataset);
+```
+
+Se dibuja un boxplot para encontrar qué variables contienen posibles outliers, en todo su conjunto:
+```{r}
+boxplot(scale(dataset[, 2:12]), ylim=c(-8,8), col="grey")
+boxplot(scale(dataset[, 13:21]), ylim=c(-8,8), col="grey")
+boxplot(scale(dataset[, 22:30]), ylim=c(-8,8), col="grey")
+```
+
+
+Matriz de correlacion
+```{r}
+m.cor <- cor(dataset[2:30], method = "pearson")
+round(m.cor, digits = 2)
+
+corrplot(m.cor, order = "AOE", method = "shade", tl.cex = 0.65)
+```

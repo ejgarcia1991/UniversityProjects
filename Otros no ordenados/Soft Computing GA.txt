@@ -1,0 +1,192 @@
+To represent a solution, there are several possibilities. Binary, integer,
+character, real value and ordered vectors, matrices, trees and virtually any computer
+based representation form.
+
+By default, some implementations of optimization methods only perform a
+minimization of a numerical evaluation function. In such cases, a simple approach is
+to transform the maximization function max .f .s// into the equivalent minimization
+task  min .f 0
+.s//, by adopting f 0
+.s/ D f .s/, where s denotes the solution
+
+paquete genalg. rbga.bin para binarios y rbga para reales.
+
+///bag-genalg.R
+El libro comienza con un segmento de código usando rbga.bin para un problema de búsqueda de precios. Se definen las restricciones, y se codifica la entrada en 50 bits. Se define una función objetivo de maximización usando -min, ya que genalg solo realiza minimización y ya; se llama la función rbga.bin con el tamaño inicial de la población, el número de iteraciones, la proporción zero a 1, la función de evaluación, y elitismo = 1.
+Se obtiene el mejor individuo de la población y se muestra un gráfico del mejor individuo y la media con el transcurso del tiempo.
+
+
+Aumentar la población inicial a 150 empeora el resultado, pero al llegar a 500 individuos ya se obtiene un resultado mejor, a un coste computacional mucho más elevado.
+
+Aumentar más iteraciones ayuda a mejorar los resultados, a un coste computacional lineal.
+
+Aumentar la proporción de zero a 1 disminuye la calidad
+
+Aumentar ligeramente el número de individuos elitistas entre cada iteración también mejora el resultado, pero un número muy elevado estanca el algoritmo.
+
+El máximo global era de 43899 y se llegó a obtener 43892 con 200 de población, 200 iteraciones y 10 individuos elitistas.
+
+Aumentar ligeramente la probabilidad de mutación de 0.019 a 0.05 no mejora el 43892, pero mejora los resultados con menor población o con menos iteraciones.
+
+///sphere.genalg.R
+El segundo código es usando números reales, y el objetivo es minimizar el cuadrado, por lo que el óptimo global es 0.
+
+El valor mínimo obtenido es 0.009797751, usando una población de 5 y 100 iteraciones.
+
+Aumentar la población inicial a 50 aumenta drásticamente el resultado a 0.0006409676.
+
+Aumentar aún más la población inicial y el número de iteraciones a 150 y 200 da resultados más cercanos a 0, en este caso 2.478245e-07.
+
+En este caso, conservar individuos de poblaciones anteriores mediante el uso de elitismo empeora el resultado, lo mismo pasa al incrementar la tasa de mutación.
+
+Ejercicios
+
+5.1. Apply a genetic algorithm to optimize the binary max sin task with D D 16
+(from Exercise 4.2), using a population size of 20, elitism of 1, and maximum of
+100 iterations. Show the best solution and fitness value.
+
+Pues al hacerlo con los valores que dicen se obtiene el óptimo global de 100...000 (1 y 15 ceros). 
+D=16
+maxsin=function(x) -sin(pi*(intbin(x))/(2^D))
+G=rbga.bin(size=D,popSize=20,iters=100,evalFunc=maxsin,elitism=1)
+summary(G,echo=TRUE)
+-G$best
+
+5.4. Approximate the eggholder function of Exercise 5.2 using a genetic programming method with a population size of 100 and other default parameters. The genetic
+programming building blocks should be defined as:
+• function symbols—use the same functions/operators that appear at the eggholder
+equation;
+• constants—use a random sampling over the eggholder constants {2,47}; and
+• variables—two inputs (x1 and x2).
+Set the domain input with 500 samples randomly generated within the range
+Œ512; 512 and stop the algorithm after 20 s.
+
+D=2
+set.seed(123)
+c1=sample(100,1)
+set.seed(1236)
+c2=sample(100,1)
+
+eggholder=function(pop) -(pop[2] + c1)*sin(sqrt(abs((pop[2]+pop[1])/c2+c1)))-pop[1]*sin(sqrt(abs(pop[1]-pop[2]+c1))) #eval function
+
+E=rbga(rep(-512,D),rep(512,D),popSize=100,evalFunc=eggholder)
+summary(E,echo=TRUE)
+E$best[length(E$best)]
+
+Defino las dos dimensiones de búsqueda con D=2 y preparo los dos valores constantes c1 y c2 con random sampling. Programo la función objetivo a minimizar eggholder. Luego aplico un genético sobre los reales en el rango de -512 a 512 para las dos dimensiones sobre las que realizar la búsqueda. Ubico los 100 de población inicial y dejo todos los otros parámetros por defecto.
+Debido al inicio aleatorio es imposible obtener un valor exacto en cada iteración, pero debe dar cerca de -508 y -500, con un valor de la función objetivo cerca de -930. Cambiando los c1 y c2 por samples dentro de la función objetivo cambia bastante los resultados obtenidos, ya que la función objetivo está en constante cambio, pero se mantiene siempre menor de -450 y -400.
+La última cuestión se contradice, primero dice de establecer 100 de población, y luego dice usar 500. Lógicamente con 500 de población mejora y el resultado se acerca a -932.2.
+
+Cargo los script de tsp, la librería de TSP es bastante sencilla, simplemente definir el mapa y el método a usar, de entre 7.
+cheapest_insertion= 8790 a 9216
+nearest_insertion=8878 a 9549 7942 a 8168
+farthest_insertion=7914 a 8623 6865 a 7382
+arbitrary_insertion=7757 a 8554 6979 a 7352
+nn = 8980 a 10075
+repetitive_nn = 8182 7078
+two_opt= 7778 a 9105 7013 a 7722
+
+El paquete GA es mucho más variado y completo que el genalg, y tiene mejores opciones de visualización incluidos en el mismo.
+
+Acepta tres tipos de vectores de entrada, binario, reales y permutación.
+Se define la función fitness, el mínimo y el máximo si son reales, o el número de bits si es binario.
+Se definen los valores tradicionales de población, iteraciones, probabilidad de mutación, elitismo.
+Además se puede definir directamente la función usada para la selección de población (aleatoria o un método específico para buscar diversidad), la operación de selección, ya implementados hay 6 tipos de selección; la operación de cruce, que similar a los anteriores se puede programar manualmente o usar uno de  los 4 tipos disponibles. Para la mutación existen igualmente 4 métodos, y puedes programar tu propio método si así lo deseas.
+Se puede definir además un tiempo de ejecución fijo o un número de iteraciones, además de un límite superior o inferior a la función objetivo, independiente de las restricciones del problema.
+Permite usar un optimizador local sobre el GA, es decir un optimizador híbrido
+Además permite usar una semilla fija para obtener siempre el mismo resultado sobre un conjunto de datos.
+
+En este caso, usando la función Ras
+Ras <- function(x) {
+  sum(x^2 - 10 * cos(2 * pi  * x)) + 10 * length(x)
+}
+
+Se busca maximizar dicha función objetivo, y el genético por defecto de GA con 35 de población y 500 iteraciones llega 1884.18 de la función objetivo. Voy a probar si ajustar diferentes parámetros cambia logra una convergencia más acelerada o llega al menos a 2000.
+
+Aumentar población puro y duro disminuye drásticamente la convergencia, pero usando la regla del 20% para el elitismo se logra converger cerca de 400 iteraciones, y llegar a 2016.675 en la función objetivo.
+
+Disminuir la probabilidad de mutación acelera aún más la convergencia, y se alcanza un nuevo máximo de 2017.555.
+
+En este punto solo se puede seguir incrementando el número de población y de iteraciones, o cambiar los métodos usados, por lo que procedo a cambiar dichos métodos.
+
+Al cambiar la forma de selección inicial de individuos se puede converger muy rápidamente a un óptimo decente en 2014.401 con la función gareal_nlrSelection (genetic algorithm real nearest length random Selection)
+
+Otra función interesante es la de tourSelection, que converge por étapas, y logra mejorar un tín a 2017.665
+
+La función de selección sigma genera una evolución más lenta, pero consistente, llegando a converger cerca de 300 iteraciones.
+
+Las otras funciones de cruce dan curvas de convergencia diferente, pero no dan mejores valores.
+
+Antes de probar con las funciones de mutación probé a desactivar totalmente las mutaciones, y converge muy rápidamente sobre un óptimo local de 1633 y se queda atascado ahí al no haber forma de salir del óptimo local, mostrando la importancia de la mutación en la exploración completa del espacio de búsqueda.
+
+Al cambiar la función de mutación por powMutation la convergencia al óptimo de 2017.665 ocurre en menos de 100 iteraciones.
+
+Finalmente, los mejores resultados se obtuvieron con 300 de población, 200 iteraciones, 50 de elitismo, 5% de probabilidad de mutación y 80% de probabilidad de cruce. La función de tourSelection para la selección y powMutation para la mutación, mientras que blxCrossover para la función de cruce.
+Usando la opción de optimizador local para hacer un híbrido se converge al óptimo de 2017.665 en solo 36 iteraciones, siendo por mucho la mejor combinación.
+
+Usando esta combinación sobre el problema de sphere, visto antes con la otra librería y cuyo óptimo global es 0, el resultado es -4.853390e-39, es decir, más de 5 veces más cercano a 0 que los obtenidos con el otro algoritmo.
+
+Sobre eggholder llega a 932.6957 en solo 14 iteraciones, superando nuevamente los resultados obtenidos por el otro paquete de genalg.
+
+5.2. Consider the eggholder function (D D 2):
+f D .x2 C 47/sin .
+pjx2 C x1=2 C 47j  x1 sin .
+pjx1  x2 C 47j/ (5.3)
+Adapt the code of file compare2.R (Sect. 5.6) such that three methods are
+compared to minimize the eggholder task: Monte Carlo search (Sect. 3.4), particle
+swarm optimization (SPSO 2011), and EDA (DVEDA). Use ten runs for each
+method, with a maximum number of evaluations set to MAXFN=1000 and solutions
+searched within the range [512,512]. Consider the percentage of successes below
+950. For the population based methods, use a population size of NP D 20 and
+maximum number of iterations of maxit D 50.
+5.3. Consider the original bag prices task (D D 5, Sect. 1.7) with a new hard
+constraint: x1 > x2 > x3 > x4 > x5. Adapt the code of Sect. 5.7 in order to
+compare death penalty and repair constraint handling strategies using an EDA of
+type UMDA. Hint: consider a simple repair solution that reorders each infeasible
+solution into a feasible one.
+
+Transparencias con las selecciones e influencia de la selección de los elementos.
+
+Shifted Rosenbrock function:
+1000 dimensiones.
+Rango entre -100 y 100.
+óptimo es el vector de decision + 1 = 0
+Función a optimizar:
+
+sum<-0
+  for(i in 1:(length(vector)-1)){
+  sum<-sum + (100*(vector[i]^2-vector[i+1])^2+(vector[i]-1)^2)
+  }
+  return(sum+1)
+
+pop 100, 100 iter, elit 20
+gareal_powMutation 0.05
+gareal_blxCrossover 0.8
+Local Search
+gareal_tourSelection
+-27.57 
+
+-24.1561 
+
+-1 nlrSelection
+
+-2.38 sigmaSelection
+
+-1.573691e-07 gareal_waCrossover
+
+-208924456
+-59408875
+
+
++ mutacion, peor resultado
+
+-1195129 gareal_rsMutation
+
+-980096.9 2000, 50, 200 rs_mutation, waCrossover, lrSelection
+0.1 mut, 0.8 cross
+
+2000, 200, 200 rs_mutation, waCrossover, lrSelection 0.1 mut, 0.8 cross
+
+-1,697,276,000,000 iter 1
+-116.8579 iter 200 elitism 100
+-0.0000005152808‬ iter 200 elitism 500

@@ -1,0 +1,23 @@
+Ejecutar todas las funciones de Modelo OVO, Modelos OVA y Modelo.
+
+Definir el procesamiento de datos en procesamiento.R, notar que esta función se llama sobre los dataset binarios, así que se puede usar cualquier cosa que se les ocurra.
+
+Cargar las librerías en ScriptPrincipal y los datos, simplemente control + enter.
+
+Decidir si se va a convertir a factor o no, y si se va a escalar en caso de regresión o no, seguir apretando control + enter hasta llegar a la suite de pruebas.
+
+La suite de pruebas tiene el siguiente formato:
+
+rfparams<-c("TRUE","1000", "5", "1") #use RF pred, ntree, mtry,nodesize
+svmparams<-c("TRUE","radial","2","0.2","0.05") #use SVM pred, kernel, degree, coef0, epsilon
+knnparams<-c("TRUE","11","1","1") #use Knn pred,k,distance,ykernel
+xgparams<-c("TRU") #use xgboost for monotonic prediction
+ordforparams<-c("TRU","1000","100","5000") #use ordinalforest package ordinalforest, nsets, ntreeperdiv, ntreefinal
+clmparams<-c("TRU") #use CLM
+
+testS<-testSuite(trainor,testor,rfparams,svmparams,knnparams,xgparams,ordforparams,clmparams)
+testS
+
+Los vectores son los parametros que se usaran para entrenar los modelos, según lo que dice al lado, TRUE, si se quiere usar ese modelo, y luego el resto de los parametros que se le pasan, para el caso de random forest, seria el ntree, mtry, nodesize, número de árboles, número de variables y nodo raíz mínimo (usualmente 1)
+
+luego se ejecuta la testSuite con todos los parametros, y en el dataframe que devuelve sale el RMSE de cada modelo según su configuración.

@@ -1,0 +1,8 @@
+FROM rocker/tidyverse:latest AS cdr
+
+RUN R -e "install.packages(c('caret','RSNNS','frbs','FSinR','forecast')repos='https://cloud.r-project.org',dependencies=TRUE,quiet=TRUE)"
+
+$ docker build -f cdr.dockerfile - t cdr .
+$ docker run --rm -e PASSWORD="1234" -p 8787:8787 cdr
+
+installed.packages()[,3]

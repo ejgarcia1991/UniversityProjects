@@ -1,0 +1,190 @@
+---
+title: "ModelosOVA"
+author: "EMAD"
+date: "28/3/2020"
+output: pdf_document
+---
+
+Funciones necesarias para OVA. La idea es generar los datasets, procesarlos, entrenar los modelos según una función flexible, y finalmente obtener las predicciones según diferentes métodos.
+```{r}
+#Genera los k-1 dataset binarios OVA de un dataset
+GenerarDatasetBinariosOVA<-function(df){
+  siz<-ncol(df)
+  if(class(df$y)=="factor"){
+    clases<-(as.integer(unique(df$y))-1)
+  }else{
+    clases<-unique(df$y)
+  }
+  clases<-sort(clases)
+  aux<-vector("list", length(clases)-1)
+  for(x in 1:(length(clases)-1)){
+    if(x==1){
+      indices<-which(df[,siz]==clases[x])
+    }
+    else{
+      indices<-c(indices,which(df[,siz]==clases[x]))
+    }
+    aux[[x]]<-df
+    aux[[x]][,siz]<-as.integer(aux[[x]][,siz])
+    aux[[x]][indices,siz]<-0
+    aux[[x]][,siz]<-ifelse(aux[[x]][,siz]==0,0,1)
+    aux[[x]][,siz]<-as.factor(aux[[x]][,siz])
+  }
+  return(aux)
+} 
+
+#Realiza un preprocesamiento sobre los dataset binarios según los algoritmos usados en el mismo. Añadir algoritmos de preprocesamiento según el formato indicado dentro de la misma.
+ProcesarDatosOVA<-function(dataframe,pos){ 
+  train<-dataframe
+  train$y<-as.factor(train$y)
+  
+  #USAR ALGORITMOS AQUI
+
+  #set.seed(seed)
+  #synth<-PRISM(train)
+  #train<-synth$cleanData
+  
+  if(class(dataframe$y)=="numeric"){
+    train$y<-as.integer(train$y)-1
+  }
+  return(train)
+}
+
+#Entrena k modelos equivalente al número de dataset de OVA según los parámetros usados en la llamada.
+EntrenarModelosOVA<-function(OVAdataset,preprocess,classifier,...){
+  models<-vector("list",length(OVAdataset))
+  for(x in 1:length(models)){
+    datosProcesados<-OVAdataset[[x]]
+    if(preprocess==TRUE){
+    datosProcesados<-ProcesarDatosOVA(OVAdataset[[x]],x)
+    }
+    formula<-as.formula(paste(colnames(datosProcesados[ncol(datosProcesados)]),"~","."))
+    set.seed(seed)
+    models[[x]] <- do.call(classifier,list(formula,datosProcesados,...))
+  }
+  return(models)
+}
+
+#OVA ordinal usando predict visto en clase
+OrdinalPredictUsingModels<-function(models,test,clases){
+  predictedValues<-rep(NA,nrow(test))
+  ClassProb<-vector("list",length(clases))
+  probabilities <- lapply(models,predict, test,"prob")
+  
+  for(x in 1:length(clases)){ 
+    if(x==1){ 
+      ClassProb[[x]]<-1-probabilities[[x]][,2] #Pr(V1)=1-Pr(Target-V1)
+    }
+    if(x>1 & x<length(clases)){
+      ClassProb[[x]]<-probabilities[[x-1]][,2]*(1-probabilities[[x]][,2]) #Pr(Vi)=Pr(Target>Vi-1)*(1-Pr(Target>Vi))
+    }
+    if(x==length(clases)){
+      ClassProb[[x]]<-probabilities[[x-1]][,2] #Pr(Vk)=Pr(Target>Vk-1)
+    }
+  }
+  
+  for(x in 1:nrow(test)){
+    maxProbability<-0 
+    for(y in 1:length(clases)){
+      if(maxProbability<ClassProb[[y]][x]){
+        maxProbability<-ClassProb[[y]][x]
+        predictedValues[x]<-clases[[y]] 
+		}
+    }
+  }  
+  return(predictedValues)
+}
+
+#SVM usa un formato diferente para obtener las probabilidades, por lo que tiene su propia función
+SVMOrdinalPredict<-function(models,test,clases){
+  predictedValues<-rep(NA,nrow(test))
+  ClassProb<-vector("list",length(clases))
+  probabilities <- lapply(models,predict, test,probability=TRUE)
+  
+  for(x in 1:length(probabilities)){
+    probabilities[[x]]<-attr(probabilities[[x]],"probabilities")
+    if(colnames(probabilities[[x]])[1]=="1"){
+      probabilities[[x]]<-probabilities[[x]][,2:1]
+    }
+  }
+  for(x in 1:length(clases)){
+    if(x==1){ 
+      ClassProb[[x]]<-1-probabilities[[x]][,2] #Pr(V1)=1-Pr(Target-V1)
+    }
+    if(x>1 & x<length(clases)){
+      ClassProb[[x]]<-probabilities[[x-1]][,2]*(1-probabilities[[x]][,2]) #Pr(Vi)=Pr(Target>Vi-1)*(1-Pr(Target>Vi)),
+    }
+    if(x==length(clases)){
+      ClassProb[[x]]<-probabilities[[x-1]][,2] #Pr(Vk)=Pr(Target>Vk-1)
+    }
+  }
+  
+  
+  for(x in 1:nrow(test)){
+    maxProbability<-0 
+    for(y in 1:length(clases)){
+      if(maxProbability<ClassProb[[y]][x]){ 
+        maxProbability<-ClassProb[[y]][x]
+        predictedValues[x]<-clases[[y]] 
+		}
+    }
+  }  
+  return(predictedValues)
+}
+
+#KNN usa un formato diferente a SVM y RF para obtener las probabilidades, por lo que tiene su propia función
+KNNOrdinalPredict<-function(models,test,clases){
+  predictedValues<-rep(NA,nrow(test))
+  ClassProb<-vector("list",length(clases))
+  for(x in 1:length(clases)){
+    if(x==1){ 
+      ClassProb[[x]]<-1-models[[x]]$prob[,2] #Pr(V1)=1-Pr(Target-V1)
+    }
+    if(x>1 & x<length(clases)){
+      ClassProb[[x]]<-models[[x-1]]$prob[,2]*(1-models[[x]]$prob[,2]) #Pr(Vi)=Pr(Target>Vi-1)*(1-Pr(Target>Vi))
+    }
+    if(x==length(clases)){
+      ClassProb[[x]]<-models[[x-1]]$prob[,2] #Pr(Vk)=Pr(Target>Vk-1)
+    }
+  }
+  
+  for(x in 1:nrow(test)){
+    maxProbability<-0 
+    for(y in 1:length(clases)){
+      if(maxProbability<ClassProb[[y]][x]){
+        maxProbability<-ClassProb[[y]][x] 
+        predictedValues[x]<-clases[[y]] 
+		}
+    }
+  }  
+  return(predictedValues)
+}
+
+#OVA aditivo con votos basado en clasificación con monotonía
+OVAPredictUsingModels<-function(models,test,clases){
+  predictedValues<-rep(1,nrow(test))
+  clases<-sort(clases)
+  assignedClass <- lapply(models,predict,test)
+  for(x in 1:nrow(test)){
+    for(y in 1:length(assignedClass)){
+      predictedValues[x]<-predictedValues[x]+(as.integer(assignedClass[[y]][x])-1)
+    }
+    predictedValues[x]<-clases[predictedValues[x]]
+  }
+  return(predictedValues)
+} 
+
+#OVA aditivo con votos basado en clasificación con monotonía, versión KNN
+KNNOVAPredict<-function(models,test,clases){
+  predictedValues<-rep(1,nrow(test))
+  clases<-sort(clases)
+    assignedClass <- models 
+  for(x in 1:nrow(test)){ 
+    for(y in 1:length(assignedClass)){
+      predictedValues[x]<-predictedValues[x]+(as.integer(assignedClass[[y]]$fitted.values[x])-1)
+    }
+    predictedValues[x]<-clases[predictedValues[x]]
+  }
+  return(predictedValues)
+}
+```

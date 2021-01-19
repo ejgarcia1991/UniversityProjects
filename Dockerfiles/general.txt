@@ -1,0 +1,21 @@
+FROM image AS name
+
+RUN ["executable","param1","param2"]
+RUN command param1 param2 (shell form)
+
+
+EXPOSE 80/tcp
+EXPOSE 80/udp
+
+CMD ["executable","param1","param2"] (exec form, this is the preferred form)
+CMD ["param1","param2"] (as default parameters to ENTRYPOINT)
+CMD command param1 param2 (shell form)
+
+
+must use -P with docker run for EXPOSE port binding
+
+Este contenedor incluir á una instalaci ón completa  de R junto  con   al menos  los 
+siguientes paq uetes:  tyd iverse,  caret ,  RSNNS ,  frbs,  FSinR , forecast .  
+El nombre de la imagen será: cdr.  
+
+$ docker build -f cdr.dockerfile - t cdr 

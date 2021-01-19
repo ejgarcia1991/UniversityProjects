@@ -1,0 +1,10 @@
+Cada script está explicado en su markdown, pero se resume en lo siguiente:
+
+EDA.Rmd: Todo el código usado para el EDA y la generación de gráficas.
+ScriptEnvioFinal.Rmd: El código que generó el mejor resultado obtenido en la competencia.
+
+El resto son parte de toda la suite de pruebas y de estudios realizado donde:
+ModelosOVA.Rmd tiene funciones para el trabajo con OVA
+ModelosOVO.Rmd tiene funciones para el trabajo con OVO
+Algoritmos extras para preprocesamiento.Rmd contiene diferentes algoritmos de preprocesamiento para copiar y pegar y ver si mejora o empeora.
+Script general de prueba.Rmd tiene las funciones generales usadas durante la competencia para probar diferentes combinaciones de algoritmos así como parámetros y configuraciones flexibles y estudios realizados sobre los mismos.

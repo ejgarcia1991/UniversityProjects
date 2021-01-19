@@ -1,0 +1,30 @@
+SELECT region, population, management FROM PozosTanzania LIMIT 100; /*Proyeccion*/
+
+SELECT * FROM PozosTanzania WHERE construction_year=2012 LIMIT 100; /*Seleccion*/
+
+SELECT payment_type, water_quality, quantity, population, management FROM PozosTanzania WHERE amount_tsh>0 LIMIT 100; /*Proyeccion y seleccion*/
+
+
+/*
+Usados para montar la BD
+*/
+
+hdfs dfs -put /home/cloudera/Pozos.csv /user/impala/input
+
+CREATE DATABASE IF NOT EXISTS Pozos LOCATION '/user/impala/impalastore.db';
+USE Pozos;
+
+CREATE TABLE IF NOT EXISTS PozosTanzania
+(id INT,amount_tsh INT,gps_height DOUBLE,longitude DOUBLE,latitude DOUBLE,
+wpt_name STRING,basin STRING,region STRING,region_code INT,district_code INT,lga STRING,ward STRING,
+population INT,construction_year INT,extraction_type STRING,extraction_type_group STRING,extraction_type_class STRING,
+management STRING,management_group STRING,payment STRING,payment_type STRING,water_quality STRING,quality_group STRING,quantity STRING,quantity_group STRING,
+source STRING,source_type STRING,source_class STRING,waterpoint_type STRING,waterpoint_type_group STRING,status_group STRING
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\,' STORED AS TEXTFILE;
+
+LOAD DATA INPATH '/user/impala/input/Pozos.csv' OVERWRITE INTO TABLE PozosTanzania;
+
+
+
+

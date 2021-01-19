@@ -1,0 +1,21 @@
+pozos = load 'input/Pozos.csv' using PigStorage(',') AS 
+(
+id:int, amount_tsh:int, gps_height:double, longitude:double, latitude:double, wpt_name:chararray, basin:chararray, region:chararray, region_code:int, district_code:int,lga:chararray, ward:chararray, population:int, construction_year:int, extraction_type:chararray, extraction_type_group:chararray, extraction_type_class:chararray, management:chararray, management_group:chararray, payment:chararray, payment_type:chararray, water_quality:chararray, quality_group:chararray, quantity:chararray, quantity_group:chararray, source:chararray, source_type:chararray, source_class:chararray, waterpoint_type:chararray, waterpoint_type_group:chararray, status_group:chararray
+);
+
+pozoslugar= FOREACH pozos GENERATE basin, region, lga, ward, gps_height, longitude, latitude; /* proyección */
+DUMP pozoslugar
+
+pozosfrescos= FOREACH (FILTER pozos BY (population>0 AND amount_tsh>0 AND construction_year>2000 AND status_group=='functional') OR (construction_year>2015 AND status_group=='functional')) GENERATE *; /*selección*/
+DUMP pozosfrescos
+
+pozosenalto= FOREACH (FILTER pozos BY gps_height>500 AND status_group=='functional') generate id, amount_tsh; /*selección y proyección*/
+DUMP pozosenalto
+
+populationPerManagement= FOREACH (GROUP pozos BY management_group) GENERATE group, AVG(pozos.amount_tsh), SUM(pozos.population); /* el promedio de agua y el total de población por cada grupo de manejo */
+DUMP populationPerManagement
+
+pozosrotos= FILTER pozos BY status_group=='non functional';
+pozosregionales= GROUP pozosrotos BY region;
+pozosquerygroupbymultiple= FOREACH pozosregionales GENERATE group, COUNT(pozosrotos), MAX(pozosrotos.population), (2020-AVG(pozosrotos.construction_year)); /*no se me ocurrió ningún nombre decente para ponerle a la variable, es la información de, por cada región, el número de pozos, el máximo de población afectada en dicha región por un pozo roto y el promedio de años de edad de dichos pozos 
+dump pozosquerygroupbymultiple

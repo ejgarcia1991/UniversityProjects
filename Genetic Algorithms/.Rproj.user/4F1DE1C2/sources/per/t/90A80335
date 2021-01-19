@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588687546004.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3673467335",
+    "id" : "90A80335",
+    "lastKnownWriteTime" : 1588713271,
+    "last_content_update" : 1588713271985,
+    "path" : "~/R Projects/GA/GArosenbrock.R",
+    "project_path" : "GArosenbrock.R",
+    "properties" : {
+        "cursorPosition" : "53,0",
+        "scrollLine" : "35",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
