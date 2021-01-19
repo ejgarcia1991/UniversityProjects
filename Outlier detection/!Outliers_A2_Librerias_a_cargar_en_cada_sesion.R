@@ -1,4 +1,4 @@
-# Mï¿½ster -> Detecciï¿½n de anomalï¿½as
+# Máster -> Detección de anomalías
 # Juan Carlos Cubero. Universidad de Granada
 
 ###########################################################################
@@ -7,7 +7,7 @@
 
 
 
-#Grï¿½ficos
+#Gráficos
 #install.packages("ggplot2")
 
 library(ggplot2)
